@@ -253,7 +253,7 @@ class _EnterNumState extends State<EnterNum> {
                       height: 5,
                     ),
                     Text(
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Est ornare aliquam consectetur lacus, dictum amet. Enim mattis mollis mauris pellentesque aenean sed.",
+                      "Verify OTP",
                       style: TextStyle(
                           color: Colors.red,
                           fontSize: 12,
