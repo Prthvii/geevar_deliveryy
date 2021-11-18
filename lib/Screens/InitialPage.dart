@@ -53,14 +53,14 @@ class _InitialPageState extends State<InitialPage> {
                 height: 32,
               ),
               Text(
-                "Lorem ipsum dolor sit ame!",
+                "Welcome to Geevar Delivery app",
                 style: profileText,
               ),
               SizedBox(
                 height: 16,
               ),
               Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Est ornare aliquam consectetur lacus",
+                "Please register or login to continue",
                 style: subTextStyle,
                 textAlign: TextAlign.center,
               )

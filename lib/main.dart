@@ -10,6 +10,15 @@ import 'package:spicy_food_delivery/api/sendNotificationToken.dart';
 
 import 'Screens/Splash.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('Handling a background message ${message.messageId} ');
@@ -83,6 +92,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    HttpOverrides.global = new MyHttpOverrides();
+
     initializeFCM();
     configLocalNotification();
   }
