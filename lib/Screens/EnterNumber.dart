@@ -360,6 +360,7 @@ class _EnterNumState extends State<EnterNum> {
           // controller: _otpController,
           keyboardType: TextInputType.number,
           controller: _otpController,
+          autoFocus: true,
           onCompleted: (v) {
             print("Completed");
           },

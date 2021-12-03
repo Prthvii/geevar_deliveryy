@@ -65,19 +65,18 @@ class _ListTileItemState extends State<NewOrder> {
                     physics: AlwaysScrollableScrollPhysics(),
                     child: Container(
                         margin: EdgeInsets.only(bottom: 200),
-
                         child: Column(
-                      children: [
-                        (isLoading == true)
-                            ? Center(
-                                child: Padding(
-                                padding: const EdgeInsets.only(top: 200),
-                                child: CircularProgressIndicator(),
-                              ))
-                            : OrderDetailsListView(),
-                        // Divider(),
-                      ],
-                    )),
+                          children: [
+                            (isLoading == true)
+                                ? Center(
+                                    child: Padding(
+                                    padding: const EdgeInsets.only(top: 200),
+                                    child: CircularProgressIndicator(),
+                                  ))
+                                : OrderDetailsListView(),
+                            // Divider(),
+                          ],
+                        )),
                   ),
       ),
     );
@@ -127,7 +126,6 @@ class _ListTileItemState extends State<NewOrder> {
                 parseTimeFromUtc(item['createdAt'].toString()).toString(),
                 style: subTextStyle,
               ),
-
             ],
           ),
           Row(
@@ -217,7 +215,7 @@ class _ListTileItemState extends State<NewOrder> {
       title: Row(
         children: [
           Text(
-            "Total bill : " + rs + item['total'].toString(),
+            "Earnings : " + rs + item['total'].toString(),
             style: TextStyle(fontSize: 14, color: Color(0xff848891)),
           ),
           SizedBox(

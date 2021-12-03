@@ -1,8 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:spicy_food_delivery/Helper/snackbar_toast_helper.dart';
 import 'package:spicy_food_delivery/Screens/DepositAtStoreScreen.dart';
 import 'package:spicy_food_delivery/Utils/Const.dart';
+import 'package:spicy_food_delivery/api/getTotalCod.dart';
+import 'package:spicy_food_delivery/api/payCod.dart';
+import 'package:spicy_food_delivery/api/paySingleCod.dart';
 
 class DepositScreen extends StatefulWidget {
   @override
@@ -14,95 +19,162 @@ class _DepositScreenState extends State<DepositScreen> {
   double _lowerValue = 50;
   double _upperValue = 180;
   bool isSwitched = false;
+  bool isTap = false;
+  var isLoading = true;
+  var codPending = [];
+  var total = "0";
+  var id;
+  Razorpay _razorpay;
+  final amntCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    this.getTotalAmout();
+    this.getPayout();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    // this.getProducts();
+    // timer = Timer.periodic(Duration(seconds: 10), (Timer t) =>NewBottomSheet());
+  }
+
+  Future<String> getTotalAmout() async {
+    var rsp = await getTotalCodApi();
+    print("totalll");
+    print(rsp);
+    print(rsp);
+    if (rsp != 0) {
+      setState(() {
+        total = rsp['TotalCODAmount'].toString();
+        codPending = rsp['codPending'];
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<String> getPayout() async {
+    var rsp = await payCodApi();
+    print("rsppppppppppp");
+
+    print(rsp);
+    if (rsp != 0) {
+      setState(() {
+        //  total = rsp['TotalCODAmount']!=null?rsp['TotalCODAmount'].toString():"0";
+        id = rsp['onlinePaymentId'] != null
+            ? rsp['onlinePaymentId'].toString()
+            : null;
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  void openCheckout(oid) async {
+    if (total.toString() == "0") {
+      showToastSuccess("Invalid Amount");
+      return;
+    }
+    var options = {
+      'key': 'rzp_live_bByB0CpxZk2E7y',
+      'Order_Id': oid != null ? oid : id.toString(),
+      //  'amount': double.parse(typed.toString())* 100,
+      'name': 'Yummitto.',
+      'image':
+          'https://firebasestorage.googleapis.com/v0/b/yummitto-app.appspot.com/o/Yummitto.png?alt=media&token=f7de3007-decc-4ca5-9703-7ed0a92e5898',
+      // 'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint('Error: e');
+    }
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    getTotalAmout();
+
+    showToastSuccess("Payment Success");
+    getTotalAmout();
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    showToastSuccess(
+        "ERROR: " + response.code.toString() + " - " + response.message);
+    //   Navigator.pop(context);
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    showToastSuccess("EXTERNAL_WALLET: " + response.walletName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text(
+          "Deposit",
+          style: HeadingTextStyle,
+        ),
         automaticallyImplyLeading: false,
         elevation: 0,
-        // actions: [
-        //   IconButton(
-        //       visualDensity: VisualDensity(horizontal: -4.0, vertical: -4.0),
-        //       icon: Padding(
-        //         padding: EdgeInsets.zero,
-        //         child: Icon(
-        //           Icons.help_outline,
-        //           color: Colors.black,
-        //         ),
-        //       ),
-        //       onPressed: () {}),
-        //   IconButton(
-        //       visualDensity: VisualDensity(horizontal: -4.0, vertical: -4.0),
-        //       icon: Padding(
-        //         padding: EdgeInsets.zero,
-        //         child: Icon(
-        //           Icons.notifications_none,
-        //           color: Colors.black,
-        //         ),
-        //       ),
-        //       onPressed: () {})
-        // ],
-        // title: Row(
-        //   children: [
-        //     CupertinoSwitch(
-        //       value: isSwitched,
-        //       onChanged: (value) {
-        //         setState(() {
-        //           isSwitched = value;
-        //           print(isSwitched);
-        //         });
-        //       },
-        //       activeColor: themeRed,
-        //     ),
-        //     SizedBox(
-        //       width: 5,
-        //     ),
-        //     Text(
-        //       "Online",
-        //       style: TextStyle(color: Colors.black),
-        //     ),
-        //   ],
-        // ),
         backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            AvailableLimit(),
-           // Slider(),
-            Divider(),
-            CashInHand(),
-            Divider(),
-            Advbal(),
-            Divider(),
-            GestureDetector(
-              child: Button("Pay by UPI"),
-              onTap: () {
-                NewBottomSheet();
-              },
+      body: isLoading == true
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  //  AvailableLimit(),
+                  // // Slider(),
+                  //  Divider(),
+                  //  CashInHand(),
+                  Divider(),
+                  Advbal(),
+                  Divider(),
+                  GestureDetector(
+                    child: Button("Pay by UPI"),
+                    onTap: () {
+                      openCheckout(null);
+                      // NewBottomSheet();
+                    },
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DepositAtStore()),
+                      );
+                    },
+                    child: Button1("Deposit at store"),
+                  ),
+                  Button("Pay by Debit card / Netbanking"),
+                  Text(
+                    "Unpaid cash will be deducted from the next payout",
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Divider(),
+
+                  OrderHis()
+                ],
+              ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DepositAtStore()),
-                );
-              },
-              child: Button("Deposit at store"),
-            ),
-            Button("Pay by Debit card / Netbanking"),
-            Text(
-              "Unpaid cash will be deducted from the next payout",
-              style: TextStyle(
-                  color: Colors.red, fontSize: 12, fontWeight: FontWeight.w400),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Divider()
-          ],
-        ),
-      ),
     );
   }
 
@@ -222,17 +294,13 @@ class _DepositScreenState extends State<DepositScreen> {
           Text(
             "Advance balance",
             style: TextStyle(
-                color: Colors.grey[400],
-                fontWeight: FontWeight.w500,
-                fontSize: 14),
+                color: Colors.red, fontWeight: FontWeight.w500, fontSize: 14),
           ),
           Spacer(),
           Text(
-            rs + "0",
+            total != null ? rs + total : rs + "0",
             style: TextStyle(
-                color: Colors.grey[400],
-                fontWeight: FontWeight.w500,
-                fontSize: 14),
+                color: Colors.red, fontWeight: FontWeight.w500, fontSize: 14),
           )
         ],
       ),
@@ -240,23 +308,56 @@ class _DepositScreenState extends State<DepositScreen> {
   }
 
   Widget Button(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10, top: 10),
-      child: Container(
-        margin: EdgeInsets.only(left: 10, right: 10),
-        alignment: Alignment.center,
-        width: double.infinity,
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Text(label,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              )),
+    return GestureDetector(
+      onTap: () {
+        openCheckout(null);
+        //  return;
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10, top: 10),
+        child: Container(
+          margin: EdgeInsets.only(left: 10, right: 10),
+          alignment: Alignment.center,
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Text(label,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                )),
+          ),
+          decoration: BoxDecoration(
+              color: Colors.green, borderRadius: BorderRadius.circular(10)),
         ),
-        decoration: BoxDecoration(
-            color: Colors.green, borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  Widget Button1(String label) {
+    return GestureDetector(
+      onTap: () {
+        showToastSuccess("Feature coming soon!");
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10, top: 10),
+        child: Container(
+          margin: EdgeInsets.only(left: 10, right: 10),
+          alignment: Alignment.center,
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Text(label,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                )),
+          ),
+          decoration: BoxDecoration(
+              color: Colors.green, borderRadius: BorderRadius.circular(10)),
+        ),
       ),
     );
   }
@@ -304,7 +405,7 @@ class _DepositScreenState extends State<DepositScreen> {
                     TextField(
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                      // controller:_phoneNumberController ,
+                      controller: amntCtrl,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         isDense: true,
@@ -317,36 +418,59 @@ class _DepositScreenState extends State<DepositScreen> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 50,
-                              child: Text(
-                                "Cancel",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500, fontSize: 18),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                height: 50,
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18),
+                                ),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.grey[100]),
                               ),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey[100]),
                             ),
                           ),
                           SizedBox(
                             width: 10,
                           ),
                           Expanded(
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 50,
-                              child: Text(
-                                "Confirm",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 18),
+                            child: GestureDetector(
+                              onTap: () {
+                                var type =
+                                    double.parse(amntCtrl.text.toString());
+                                var limit = double.parse(total.toString());
+                                if (total != "0" && type < limit) {
+                                  // openCheckout(type);
+                                  Navigator.pop(context);
+                                  showToastSuccess("Submitted!");
+                                } else {
+                                  Navigator.pop(context);
+
+                                  showToastSuccess("Invalid Amount!");
+                                }
+                                // Navigator.pop(context);
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                height: 50,
+                                child: Text(
+                                  "Confirm",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18),
+                                ),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: themeRed),
                               ),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: themeRed),
                             ),
                           ),
                         ],
@@ -361,5 +485,101 @@ class _DepositScreenState extends State<DepositScreen> {
                 ),
               ),
             ]));
+  }
+
+  ///history list
+
+  OrderHis() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Order History",
+            style: profileText,
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          ListView.separated(
+            scrollDirection: Axis.vertical,
+            physics: NeverScrollableScrollPhysics(),
+            separatorBuilder: (context, index) => SizedBox(
+              height: 10,
+            ),
+            shrinkWrap: true,
+            itemCount: codPending != null ? codPending.length : 0,
+            itemBuilder: (context, index) {
+              final item = codPending != null ? codPending[index] : null;
+              return histryList(item, index);
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  histryList(var item, int index) {
+    return Card(
+      elevation: 5,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Order No:  " + "#" + item['orderNo'].toString(),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    "Amount:  " + rs + item['amount'].toString(),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  )
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () async {
+                setState(() {
+                  isLoading = true;
+                });
+                var rsp = await paySingleCodApi(item['order']);
+                print("singleepaay");
+                print(rsp);
+                if (rsp != 0) {
+                  openCheckout(rsp['onlinePaymentId'].toString());
+                }
+                setState(() {
+                  isLoading = false;
+                });
+              },
+              child: isTap == true
+                  ? Container(
+                      height: 30, width: 30, child: CircularProgressIndicator())
+                  : Container(
+                      decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
+                        child: Text(
+                          "Pay",
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

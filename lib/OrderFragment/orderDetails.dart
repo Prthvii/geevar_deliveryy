@@ -195,7 +195,7 @@ class _OrderDetailsState extends State<OrderDetailsPg> {
           print(rsp);
           if (rsp['message'].toString().trim() ==
               "Order status changed to delivered") {
-            var orderId = await sharedPrefrence("DID",null);
+            var orderId = await sharedPrefrence("DID", null);
             showToastSuccess("Delivered....");
             Navigator.pushReplacement(
               context,
@@ -212,8 +212,8 @@ class _OrderDetailsState extends State<OrderDetailsPg> {
         }
       },
       borderRadius: 1,
-      innerColor: Color(0xffE84F23),
-      outerColor: Color(0xffE84F23),
+      innerColor: themeRed,
+      outerColor: themeRed,
       sliderButtonIcon: Icon(
         Icons.double_arrow,
         color: Colors.white,

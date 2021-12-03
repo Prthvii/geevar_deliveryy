@@ -102,7 +102,7 @@ class _ManageProfileState extends State<ManageProfile> {
                       shape: BoxShape.circle,
                       image: DecorationImage(
                           image: NetworkImage(
-                            "https://cdn-cf.sharechat.com/vff_blur_1aae35b5_1592058176502_1.jpeg",
+                            "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
                           ),
                           fit: BoxFit.cover))),
               Text(
@@ -138,7 +138,7 @@ class _ManageProfileState extends State<ManageProfile> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        rating == "null" ? "4" : rating.toString(),
+                        rating == "null" ? "0" : rating.toString(),
                         style: TextStyle(
                             fontWeight: FontWeight.w600, fontSize: 16),
                       ),
@@ -173,11 +173,11 @@ class _ManageProfileState extends State<ManageProfile> {
           Tile("Phone", "+91 " + phoneNumber.toString(), () {}),
           Tile("Alternate Phone", "+91 " + altPhn.toString(), () {}),
           Tile("Aadhar No.", aadhar.toString(), () {}),
-          Tile("DL No.", "DDS6585545", () {}),
-          Tile("DL Expiry", "20-03-2040", () {}),
-          Tile("Rating", "4.92", () {}),
-          Tile("Extra Cash", "-₹200.00", () {}),
-          Tile("App Version", "5.2.5", () {}),
+          // Tile("DL No.", "DDS6585545", () {}),
+          // Tile("DL Expiry", "20-03-2040", () {}),
+          // Tile("Rating", "4.92", () {}),
+          // Tile("Extra Cash", "-₹200.00", () {}),
+          // Tile("App Version", "5.2.5", () {}),
           DividerWidget,
           Padding(
             padding: const EdgeInsets.all(
@@ -191,22 +191,22 @@ class _ManageProfileState extends State<ManageProfile> {
           Tile("Bank Name", bnkName.toString(), () {}),
           Tile("Account No.", accNo.toString(), () {}),
           Tile("IFSC Code", IFSC.toString(), () {}),
-          Tile("PAN Card No.", "123456789", () {}),
-          Tile("Max Security Deposit", "0", () {}),
+          // Tile("PAN Card No.", "123456789", () {}),
+          // Tile("Max Security Deposit", "0", () {}),
           DividerWidget,
-          Padding(
-            padding: const EdgeInsets.all(
-              10,
-            ),
-            child: Text(
-              "Other Details",
-              style: subTextStyle,
-            ),
-          ),
-          Tile("Reserved For Merchand", "", () {}),
-          Tile("Current State", "Not Reserved", () {}),
-          Tile("Upcoming Reservation", "NA", () {}),
-          Tile("Assets", "Bibs, bag, Tshirt", () {}),
+          // Padding(
+          //   padding: const EdgeInsets.all(
+          //     10,
+          //   ),
+          //   child: Text(
+          //     "Other Details",
+          //     style: subTextStyle,
+          //   ),
+          // ),
+          // Tile("Reserved For Merchand", "", () {}),
+          // Tile("Current State", "Not Reserved", () {}),
+          // Tile("Upcoming Reservation", "NA", () {}),
+          // Tile("Assets", "Bibs, bag, Tshirt", () {}),
           SizedBox(
             height: 20,
           )

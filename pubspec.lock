@@ -134,6 +134,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.7"
+  eventify:
+    dependency: transitive
+    description:
+      name: eventify
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -346,6 +353,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.3"
+  location:
+    dependency: "direct dev"
+    description:
+      name: location
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.5.4"
   logging:
     dependency: transitive
     description:
@@ -374,6 +388,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.0"
+  onesignal_flutter:
+    dependency: "direct dev"
+    description:
+      name: onesignal_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.2.7"
   path:
     dependency: transitive
     description:
@@ -451,6 +472,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.4.4"
+  razorpay_flutter:
+    dependency: "direct dev"
+    description:
+      name: razorpay_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.7"
   shared_preferences:
     dependency: "direct dev"
     description:
