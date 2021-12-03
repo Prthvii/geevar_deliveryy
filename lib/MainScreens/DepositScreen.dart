@@ -84,9 +84,9 @@ class _DepositScreenState extends State<DepositScreen> {
       'key': 'rzp_live_bByB0CpxZk2E7y',
       'Order_Id': oid != null ? oid : id.toString(),
       //  'amount': double.parse(typed.toString())* 100,
-      'name': 'Yummitto.',
-      'image':
-          'https://firebasestorage.googleapis.com/v0/b/yummitto-app.appspot.com/o/Yummitto.png?alt=media&token=f7de3007-decc-4ca5-9703-7ed0a92e5898',
+      'name': 'Geevar',
+      // 'image':
+      //     'https://firebasestorage.googleapis.com/v0/b/yummitto-app.appspot.com/o/Yummitto.png?alt=media&token=f7de3007-decc-4ca5-9703-7ed0a92e5898',
       // 'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
       'external': {
         'wallets': ['paytm']
